@@ -11,6 +11,7 @@ import pandas as pd
 import torch.optim as optim
 import math
 import multiprocessing
+import time
 
 from PIL import Image
 from torchvision import transforms
@@ -41,7 +42,7 @@ else:
 print("Use device:",device)
 
 # set random seed
-SEED = 6220
+SEED = time.ctime()
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 np.random.seed(SEED)
@@ -428,3 +429,85 @@ plt_loss_acc(valid_loss_list, "valid_loss")
 plt_loss_acc(valid_acc_list, "valid_acc")
 plt_loss_all()
 plt_acc_all()
+#---------------------------------------------------------------------------------------------------------------------------
+print(predicted[0].item())
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import torch.utils.data as data_utils
+TESTDATA_PATH = './noodles_dataset_3k/test/unknown'
+for data in os.walk(TESTDATA_PATH):
+  test_data=data[2]
+test_transform = transforms.Compose([
+
+    transforms.Resize((224, 224)),
+
+    transforms.ToTensor(),
+
+    transforms.Normalize(
+        mean=[0.485,0.456,0.406],
+        std=[0.229,0.224,0.225])
+    ])
+class Custom_testset(Dataset):
+    def __init__(self,testData,transform=None):
+        # --------------------------------------------
+        # Initialize paths, transforms, and so on
+        # --------------------------------------------
+        self.images = testData
+        #self.label = trainLabel
+        self.transform = transform
+
+    def __getitem__(self, index):
+        # --------------------------------------------
+        # 1. Read from file (using numpy.fromfile, PIL.Image.open)
+        # 2. Preprocess the data (torchvision.Transform).
+        # 3. Return the data (e.g. image and label)
+        # --------------------------------------------
+        imgpath = self.images[index]
+        img = Image.open(imgpath).convert('RGB')
+
+        if self.transform:
+          img = self.transform(img)
+
+        return img
+
+    def __len__(self):
+        # --------------------------------------------
+        # Indicate the total size of the dataset
+        # --------------------------------------------
+        return len(self.images)
+
+def trueclass(num):
+  if num==0:
+    return 0
+  elif num==1:
+    return 1
+  elif num==2:
+    return 2
+
+imgpath=[]
+prediction=[]
+for photo in test_data:
+  path_img = os.path.join(TESTDATA_PATH,photo)
+  imgpath.append(path_img)
+# print('id = ',test_data)
+test_set = Custom_testset(imgpath,test_transform)
+testloader = DataLoader(test_set, batch_size=1 , shuffle=False, num_workers = 0)
+for images in testloader:
+    print('Image batch dimensions:', images.shape)
+    break
+
+#images = np.transpose(images, (1,2,0))
+for images in testloader:
+  #print('image = ',images)
+  images=images.to(device)
+  output = model(images)
+  predicted = torch.argmax(output,dim=1)
+  #print('Image predicted label = :', predicted.item())
+  prediction=np.append(prediction,trueclass(predicted.item()))
+
+example={'image':test_data,
+      'class':prediction}
+df = pd.DataFrame(example)
+print(df)
+df.to_csv('./result.csv',index=False)
