@@ -42,7 +42,7 @@ else:
 print("Use device:",device)
 
 # set random seed
-SEED = time.ctime()
+SEED = int(time.time())
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 np.random.seed(SEED)
