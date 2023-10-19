@@ -257,10 +257,20 @@ class VGG16(nn.Module):
         self.feat_classifier = nn.Sequential(
             nn.Linear(7*7*512, 4096),
             nn.ReLU(),
-            nn.Linear(4096, 4096),
+
+            nn.Linear(4096, 2048),
             nn.ReLU(),
-            nn.Linear(4096, class_num),
-            nn.Softmax(dim=1)
+
+            nn.Linear(2048, 1024),
+            nn.ReLU(),
+
+            nn.Linear(1024, 512),
+            nn.ReLU(),
+
+            nn.Linear(512, 256),
+            nn.ReLU(),
+
+            nn.Linear(256, class_num),
         )
 
     def forward(self, x):
@@ -281,6 +291,13 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 epochs = 10
 
 model.train()
+#---------------------------------------------------------------------------------------------------------------------------
+from torchsummary import summary
+summary(model, (3,224,224))
+#---------------------------------------------------------------------------------------------------------------------------
+WEIGHT_PATH = 'Saving_Path/model_weight.pth'
+checkpoint = torch.load(WEIGHT_PATH , map_location="cuda:0")
+model.load_state_dict(checkpoint)
 #---------------------------------------------------------------------------------------------------------------------------
 # Training model
 train_loss_list = []
@@ -506,8 +523,8 @@ for images in testloader:
   #print('Image predicted label = :', predicted.item())
   prediction=np.append(prediction,trueclass(predicted.item()))
 
-example={'image':test_data,
-      'class':prediction}
+example={'ID':test_data,
+      'Target':str(prediction)}
 df = pd.DataFrame(example)
 print(df)
 df.to_csv('./result.csv',index=False)
