@@ -256,18 +256,24 @@ class VGG16(nn.Module):
 #---------------------------------------------------------------------------------------------------------------------------
         self.feat_classifier = nn.Sequential(
             nn.Linear(7*7*512, 4096),
+            nn.Dropout(0,2),
+            nn.Conv1d(4096),
             nn.ReLU(),
 
             nn.Linear(4096, 2048),
+            nn.Conv1d(2048),
             nn.ReLU(),
 
             nn.Linear(2048, 1024),
+            nn.Conv1d(1024),
             nn.ReLU(),
 
             nn.Linear(1024, 512),
+            nn.Conv1d(512),
             nn.ReLU(),
 
             nn.Linear(512, 256),
+            nn.Conv1d(256),
             nn.ReLU(),
 
             nn.Linear(256, class_num),
