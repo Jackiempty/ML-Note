@@ -446,10 +446,10 @@ def plt_loss_all():
     ax1.set_xlabel('epoch')
     plt.show()
 #---------------------------------------------------------------------------------------------------------------------------
-plt_loss_acc(train_loss_list, "train_loss")
-plt_loss_acc(train_acc_list, "train_acc")
-plt_loss_acc(valid_loss_list, "valid_loss")
-plt_loss_acc(valid_acc_list, "valid_acc")
+# plt_loss_acc(train_loss_list, "train_loss")
+# plt_loss_acc(train_acc_list, "train_acc")
+# plt_loss_acc(valid_loss_list, "valid_loss")
+# plt_loss_acc(valid_acc_list, "valid_acc")
 plt_loss_all()
 plt_acc_all()
 #---------------------------------------------------------------------------------------------------------------------------
