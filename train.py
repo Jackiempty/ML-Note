@@ -523,8 +523,16 @@ for images in testloader:
   #print('Image predicted label = :', predicted.item())
   prediction=np.append(prediction,trueclass(predicted.item()))
 
-example={'ID':test_data,
-      'Target':str(prediction)}
+prediction_lst=prediction.tolist()
+for i in range(len(prediction_lst)):
+  prediction_lst[i] = int(prediction_lst[i])
+test_data_num=[]
+for i in range(len(test_data)):
+  test_data_num.append(i)
+
+example={'ID':test_data_num,
+      'Target':prediction_lst}
 df = pd.DataFrame(example)
 print(df)
+
 df.to_csv('./result.csv',index=False)
